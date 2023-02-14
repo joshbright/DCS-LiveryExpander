@@ -19,9 +19,6 @@ namespace DCSLiveryExpander
 		MainForm(void)
 		{
 			InitializeComponent();
-			//
-			//TODO: Add the constructor code here
-			//
 		}
 
 	protected:
@@ -37,17 +34,21 @@ namespace DCSLiveryExpander
 		}
 	private: System::Windows::Forms::Button^ bSelectFolder;
 	private: System::Windows::Forms::Button^ bMakeChanges;
+	private: System::Windows::Forms::ListBox^ listFiles;
 	protected:
 
 	protected:
 
-	private: System::Windows::Forms::ListBox^ listBox1;
+
 	private: System::Windows::Forms::Button^ bCancel;
+	private: System::Windows::Forms::TextBox^ tbFolder;
 
-	private: System::Windows::Forms::TextBox^ textBox1;
+
 	private: System::Windows::Forms::Label^ label1;
 	private: System::Windows::Forms::Label^ label2;
 	private: System::Windows::Forms::FolderBrowserDialog^ folderBrowserDialog1;
+	private: String^ folderName;
+	private: System::Windows::Forms::Label^ label3;
 
 
 	private:
@@ -65,12 +66,13 @@ namespace DCSLiveryExpander
 		{
 			this->bSelectFolder = (gcnew System::Windows::Forms::Button());
 			this->bMakeChanges = (gcnew System::Windows::Forms::Button());
-			this->listBox1 = (gcnew System::Windows::Forms::ListBox());
+			this->listFiles = (gcnew System::Windows::Forms::ListBox());
 			this->bCancel = (gcnew System::Windows::Forms::Button());
-			this->textBox1 = (gcnew System::Windows::Forms::TextBox());
+			this->tbFolder = (gcnew System::Windows::Forms::TextBox());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->label2 = (gcnew System::Windows::Forms::Label());
 			this->folderBrowserDialog1 = (gcnew System::Windows::Forms::FolderBrowserDialog());
+			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->SuspendLayout();
 			// 
 			// bSelectFolder
@@ -81,24 +83,26 @@ namespace DCSLiveryExpander
 			this->bSelectFolder->TabIndex = 0;
 			this->bSelectFolder->Text = L"Select Folder";
 			this->bSelectFolder->UseVisualStyleBackColor = true;
-			this->bSelectFolder->Click += gcnew System::EventHandler(this, &MainForm::button1_Click);
+			this->bSelectFolder->Click += gcnew System::EventHandler(this, &MainForm::bSelectFolder_Click);
 			// 
 			// bMakeChanges
 			// 
+			this->bMakeChanges->Enabled = false;
 			this->bMakeChanges->Location = System::Drawing::Point(245, 442);
 			this->bMakeChanges->Name = L"bMakeChanges";
 			this->bMakeChanges->Size = System::Drawing::Size(160, 60);
-			this->bMakeChanges->TabIndex = 1;
+			this->bMakeChanges->TabIndex = 2;
 			this->bMakeChanges->Text = L"Make Changes";
 			this->bMakeChanges->UseVisualStyleBackColor = true;
+			this->bMakeChanges->Click += gcnew System::EventHandler(this, &MainForm::bMakeChanges_Click);
 			// 
-			// listBox1
+			// listFiles
 			// 
-			this->listBox1->FormattingEnabled = true;
-			this->listBox1->Location = System::Drawing::Point(12, 80);
-			this->listBox1->Name = L"listBox1";
-			this->listBox1->Size = System::Drawing::Size(627, 342);
-			this->listBox1->TabIndex = 2;
+			this->listFiles->FormattingEnabled = true;
+			this->listFiles->Location = System::Drawing::Point(12, 80);
+			this->listFiles->Name = L"listFiles";
+			this->listFiles->Size = System::Drawing::Size(863, 342);
+			this->listFiles->TabIndex = 1;
 			// 
 			// bCancel
 			// 
@@ -108,16 +112,18 @@ namespace DCSLiveryExpander
 			this->bCancel->TabIndex = 3;
 			this->bCancel->Text = L"Cancel";
 			this->bCancel->UseVisualStyleBackColor = true;
+			this->bCancel->Click += gcnew System::EventHandler(this, &MainForm::bCancel_Click);
 			// 
-			// textBox1
+			// tbFolder
 			// 
-			this->textBox1->Enabled = false;
-			this->textBox1->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 15.75F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			this->tbFolder->Enabled = false;
+			this->tbFolder->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 14.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
-			this->textBox1->Location = System::Drawing::Point(178, 27);
-			this->textBox1->Name = L"textBox1";
-			this->textBox1->Size = System::Drawing::Size(461, 31);
-			this->textBox1->TabIndex = 4;
+			this->tbFolder->Location = System::Drawing::Point(178, 41);
+			this->tbFolder->Name = L"tbFolder";
+			this->tbFolder->Size = System::Drawing::Size(697, 29);
+			this->tbFolder->TabIndex = 4;
+			this->tbFolder->TabStop = false;
 			// 
 			// label1
 			// 
@@ -135,16 +141,28 @@ namespace DCSLiveryExpander
 			this->label2->Size = System::Drawing::Size(0, 13);
 			this->label2->TabIndex = 6;
 			// 
+			// label3
+			// 
+			this->label3->AutoSize = true;
+			this->label3->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 14.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->label3->Location = System::Drawing::Point(179, 13);
+			this->label3->Name = L"label3";
+			this->label3->Size = System::Drawing::Size(144, 24);
+			this->label3->TabIndex = 7;
+			this->label3->Text = L"Selected Folder";
+			// 
 			// MainForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(651, 596);
+			this->ClientSize = System::Drawing::Size(887, 596);
+			this->Controls->Add(this->label3);
 			this->Controls->Add(this->label2);
 			this->Controls->Add(this->label1);
-			this->Controls->Add(this->textBox1);
+			this->Controls->Add(this->tbFolder);
 			this->Controls->Add(this->bCancel);
-			this->Controls->Add(this->listBox1);
+			this->Controls->Add(this->listFiles);
 			this->Controls->Add(this->bMakeChanges);
 			this->Controls->Add(this->bSelectFolder);
 			this->Name = L"MainForm";
@@ -158,7 +176,38 @@ namespace DCSLiveryExpander
 	{
 
 	}
-	private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) 
+	private: System::Void bSelectFolder_Click(System::Object^ sender, System::EventArgs^ e)
+	{
+		System::Windows::Forms::DialogResult result = folderBrowserDialog1->ShowDialog();
+
+		if (result == System::Windows::Forms::DialogResult::OK)
+		{
+			folderName = folderBrowserDialog1->SelectedPath;
+
+			if (System::IO::Directory::Exists(folderName))
+			{
+				tbFolder->Text = folderName;
+				/*
+					TODO:
+					1. Since the folder exists we need to grab the list of description.lua files
+					2. If no files found, let user know
+				*/
+			}
+			else
+			{
+				/*
+					Get the list of 
+				*/
+			}
+
+		}
+
+	}
+	private: System::Void bMakeChanges_Click(System::Object^ sender, System::EventArgs^ e)
+	{
+
+	}
+	private: System::Void bCancel_Click(System::Object^ sender, System::EventArgs^ e)
 	{
 
 	}
