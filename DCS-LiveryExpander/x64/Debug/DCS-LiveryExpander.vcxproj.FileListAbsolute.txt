@@ -1,4 +1,0 @@
-F:\Projects\DCS-LiveryExpander\DCS-LiveryExpander\x64\Debug\DCS-LiveryExpander.vcxproj.AssemblyReference.cache
-F:\Projects\DCS-LiveryExpander\DCS-LiveryExpander\x64\Debug\DCS-LiveryExpander.vcxproj.SuggestedBindingRedirects.cache
-F:\Projects\DCS-LiveryExpander\DCS-LiveryExpander\x64\Debug\DCSLiveryExpander.MainForm.resources
-F:\Projects\DCS-LiveryExpander\DCS-LiveryExpander\x64\Debug\DCS-LiveryExpander.vcxproj.GenerateResource.cache
