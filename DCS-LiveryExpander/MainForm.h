@@ -382,9 +382,7 @@ namespace DCSLiveryExpander
 
 
 
-
-
-
+					//Error handling will need to be improved
 					if (String::IsNullOrWhiteSpace(dcsInstallLocation) || String::IsNullOrWhiteSpace(dcsBetaInstallLocation) || String::IsNullOrWhiteSpace(steamInstallLocation))
 					{
 
