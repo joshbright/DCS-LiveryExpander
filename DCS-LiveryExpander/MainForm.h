@@ -1,14 +1,16 @@
 #pragma once
-
 namespace DCSLiveryExpander
 {
 
 	using namespace System;
+	using namespace System::IO;
 	using namespace System::ComponentModel;
 	using namespace System::Collections;
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace System::Text;
+	using namespace Microsoft::Win32;
 
 	/// <summary>
 	/// Summary for MainForm
@@ -32,7 +34,8 @@ namespace DCSLiveryExpander
 					delete components;
 				}
 			}
-		private: 
+		private:
+			const int dcsSteamID = 223750;
 			System::Windows::Forms::Button^ bSelectFolder;
 			System::Windows::Forms::Button^ bMakeChanges;
 			System::Windows::Forms::ListBox^ listFiles;
@@ -46,7 +49,8 @@ namespace DCSLiveryExpander
 			System::Windows::Forms::FolderBrowserDialog^ folderBrowserDialog1;
 			String^ folderName;
 			System::Windows::Forms::Label^ label3;
-			System::Windows::Forms::Button^ bSelectSteamFolder;
+	private: System::Windows::Forms::Button^ bSelectGameFolder;
+
 			System::Windows::Forms::Button^ bSelectModFolder;
 			System::Windows::Forms::Button^ bBackupFiles;
 			System::Windows::Forms::Button^ bRestoreBackups;
@@ -73,7 +77,7 @@ namespace DCSLiveryExpander
 				this->label2 = (gcnew System::Windows::Forms::Label());
 				this->folderBrowserDialog1 = (gcnew System::Windows::Forms::FolderBrowserDialog());
 				this->label3 = (gcnew System::Windows::Forms::Label());
-				this->bSelectSteamFolder = (gcnew System::Windows::Forms::Button());
+				this->bSelectGameFolder = (gcnew System::Windows::Forms::Button());
 				this->bSelectModFolder = (gcnew System::Windows::Forms::Button());
 				this->bBackupFiles = (gcnew System::Windows::Forms::Button());
 				this->bRestoreBackups = (gcnew System::Windows::Forms::Button());
@@ -146,15 +150,15 @@ namespace DCSLiveryExpander
 				this->label3->TabIndex = 7;
 				this->label3->Text = L"Selected Folder";
 				// 
-				// bSelectSteamFolder
+				// bSelectGameFolder
 				// 
-				this->bSelectSteamFolder->Location = System::Drawing::Point(12, 12);
-				this->bSelectSteamFolder->Name = L"bSelectSteamFolder";
-				this->bSelectSteamFolder->Size = System::Drawing::Size(160, 60);
-				this->bSelectSteamFolder->TabIndex = 8;
-				this->bSelectSteamFolder->Text = L"Select Base Liveries";
-				this->bSelectSteamFolder->UseVisualStyleBackColor = true;
-				this->bSelectSteamFolder->Click += gcnew System::EventHandler(this, &MainForm::bSelectSteamFolder_Click);
+				this->bSelectGameFolder->Location = System::Drawing::Point(12, 12);
+				this->bSelectGameFolder->Name = L"bSelectGameFolder";
+				this->bSelectGameFolder->Size = System::Drawing::Size(160, 60);
+				this->bSelectGameFolder->TabIndex = 8;
+				this->bSelectGameFolder->Text = L"Select Base Liveries";
+				this->bSelectGameFolder->UseVisualStyleBackColor = true;
+				this->bSelectGameFolder->Click += gcnew System::EventHandler(this, &MainForm::bSelectGameFolder_Click);
 				// 
 				// bSelectModFolder
 				// 
@@ -196,7 +200,7 @@ namespace DCSLiveryExpander
 				this->Controls->Add(this->bRestoreBackups);
 				this->Controls->Add(this->bBackupFiles);
 				this->Controls->Add(this->bSelectModFolder);
-				this->Controls->Add(this->bSelectSteamFolder);
+				this->Controls->Add(this->bSelectGameFolder);
 				this->Controls->Add(this->label3);
 				this->Controls->Add(this->label2);
 				this->Controls->Add(this->label1);
@@ -283,10 +287,128 @@ namespace DCSLiveryExpander
 				bRestoreBackups->Enabled = false;
 			}
 
-			System::Void bSelectSteamFolder_Click(System::Object^ sender, System::EventArgs^ e)
+
+			bool TestLocation(String^ location)
 			{
-				//We will want to read the registry keys to get the steam/DCS folder
-				ResetForm();
+				//TODO:fill this out
+				return false;
+			}
+
+
+			String^ GetDCSSteamLocation(String^ steamPath)
+			{
+				try
+				{
+					String^ libraryFolderText = File::ReadAllText(steamPath + "/steamapps/libraryfolder.vdf");					
+					
+					//Regex to find the drive that the steam library is located
+					String^ steamDriveRegex = "\"\\d\"[\\s]*{[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*\"223750\"[\\s]*\"[0-9]*\"[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*}";
+
+					RegularExpressions::Match^ drive = RegularExpressions::Regex::Match(libraryFolderText, steamDriveRegex);
+
+					//Regex to get the path line of the steam library
+					String^ steamLibraryRegex = "\"path\"[\\s]*[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*(Steam|SteamLibrary)\"";
+					
+					RegularExpressions::Match^ path = RegularExpressions::Regex::Match(drive->Value, steamLibraryRegex);
+
+					//Regex to extract out the actual path
+					String^ libraryLocationRegex = "\"\\w:[\\w\\d\\\\\\s\\(\\)\\\"]*\"";
+
+					RegularExpressions::Match^ folderLocation = RegularExpressions::Regex::Match(path->Value, libraryLocationRegex);
+
+					String^ gameLocation = folderLocation->Value->Trim('\"') + "steamapps/common/DCSWorld/Config/";
+					
+
+
+					/*
+						After getting the game location we need to check to make sure that the folder actually exists
+					
+						call TestLocation to determine if the file exists
+					
+					*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				}
+				catch (Exception^ ex)
+				{
+
+				}
+			}
+
+			System::Void bSelectGameFolder_Click(System::Object^ sender, System::EventArgs^ e)
+			{
+				try
+				{
+					//We will want to read the registry keys to get the steam/DCS folder
+
+					//Look for standalone DCS installation
+
+					String^ steamInstallLocation = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", "")->ToString();
+					String^ steamDCSLocation = GetDCSSteamLocation(steamInstallLocation);
+					
+					String^ dcsInstallLocation = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World", "Path", "")->ToString();
+					String^ dcsBetaInstallLocation = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World OpenBeta", "Path", "")->ToString();
+					
+
+					/*
+						check if (library + "steamapps/common/DCSWorld") exists;
+					
+						
+
+						Should a button or checkbox be added to ask if the coremods aircraft should be modified?
+							- would only affect the install location files
+
+
+
+
+
+					
+					
+					*/
+
+
+
+
+
+
+					if (String::IsNullOrWhiteSpace(dcsInstallLocation) || String::IsNullOrWhiteSpace(dcsBetaInstallLocation) || String::IsNullOrWhiteSpace(steamInstallLocation))
+					{
+
+					}
+					else
+					{
+						//Report that no paths could be found
+					}
+
+					//if(installLocation)
+					int test = 1;
+
+
+
+					//Game ID is 223750
+
+
+					ResetForm();
+				}
+				catch (Exception^ ex)
+				{
+					MessageBox::Show("There was an exception when reading the registry key: " + ex->ToString());
+					ResetForm();
+				}
 			}
 			System::Void bSelectModFolder_Click(System::Object^ sender, System::EventArgs^ e)
 			{
