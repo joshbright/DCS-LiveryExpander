@@ -39,21 +39,19 @@ namespace DCSLiveryExpander
 			System::Windows::Forms::Button^ bSelectFolder;
 			System::Windows::Forms::Button^ bMakeChanges;
 			System::Windows::Forms::ListBox^ listFiles;
-
-
 			System::Windows::Forms::TextBox^ tbFolder;
-
-
 			System::Windows::Forms::Label^ label1;
 			System::Windows::Forms::Label^ label2;
 			System::Windows::Forms::FolderBrowserDialog^ folderBrowserDialog1;
 			String^ folderName;
 			System::Windows::Forms::Label^ label3;
-	private: System::Windows::Forms::Button^ bSelectGameFolder;
+			System::Windows::Forms::Button^ bSelectGameFolder;
 
 			System::Windows::Forms::Button^ bSelectModFolder;
 			System::Windows::Forms::Button^ bBackupFiles;
 			System::Windows::Forms::Button^ bRestoreBackups;
+			System::Windows::Forms::CheckBox^ cbOverride;
+
 
 
 
@@ -81,14 +79,17 @@ namespace DCSLiveryExpander
 				this->bSelectModFolder = (gcnew System::Windows::Forms::Button());
 				this->bBackupFiles = (gcnew System::Windows::Forms::Button());
 				this->bRestoreBackups = (gcnew System::Windows::Forms::Button());
+				this->cbOverride = (gcnew System::Windows::Forms::CheckBox());
 				this->SuspendLayout();
 				// 
 				// bSelectFolder
 				// 
+				this->bSelectFolder->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 14.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+					static_cast<System::Byte>(0)));
 				this->bSelectFolder->Location = System::Drawing::Point(344, 12);
 				this->bSelectFolder->Name = L"bSelectFolder";
 				this->bSelectFolder->Size = System::Drawing::Size(160, 60);
-				this->bSelectFolder->TabIndex = 0;
+				this->bSelectFolder->TabIndex = 2;
 				this->bSelectFolder->Text = L"Select Custom Folder";
 				this->bSelectFolder->UseVisualStyleBackColor = true;
 				this->bSelectFolder->Click += gcnew System::EventHandler(this, &MainForm::bSelectFolder_Click);
@@ -96,10 +97,12 @@ namespace DCSLiveryExpander
 				// bMakeChanges
 				// 
 				this->bMakeChanges->Enabled = false;
-				this->bMakeChanges->Location = System::Drawing::Point(178, 621);
+				this->bMakeChanges->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 14.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+					static_cast<System::Byte>(0)));
+				this->bMakeChanges->Location = System::Drawing::Point(178, 657);
 				this->bMakeChanges->Name = L"bMakeChanges";
 				this->bMakeChanges->Size = System::Drawing::Size(160, 60);
-				this->bMakeChanges->TabIndex = 2;
+				this->bMakeChanges->TabIndex = 6;
 				this->bMakeChanges->Text = L"Make Changes";
 				this->bMakeChanges->UseVisualStyleBackColor = true;
 				this->bMakeChanges->Click += gcnew System::EventHandler(this, &MainForm::bMakeChanges_Click);
@@ -109,8 +112,9 @@ namespace DCSLiveryExpander
 				this->listFiles->FormattingEnabled = true;
 				this->listFiles->Location = System::Drawing::Point(12, 143);
 				this->listFiles->Name = L"listFiles";
+				this->listFiles->SelectionMode = System::Windows::Forms::SelectionMode::None;
 				this->listFiles->Size = System::Drawing::Size(492, 472);
-				this->listFiles->TabIndex = 1;
+				this->listFiles->TabIndex = 99;
 				// 
 				// tbFolder
 				// 
@@ -119,8 +123,9 @@ namespace DCSLiveryExpander
 					static_cast<System::Byte>(0)));
 				this->tbFolder->Location = System::Drawing::Point(12, 108);
 				this->tbFolder->Name = L"tbFolder";
+				this->tbFolder->ReadOnly = true;
 				this->tbFolder->Size = System::Drawing::Size(492, 29);
-				this->tbFolder->TabIndex = 4;
+				this->tbFolder->TabIndex = 99;
 				this->tbFolder->TabStop = false;
 				// 
 				// label1
@@ -152,20 +157,24 @@ namespace DCSLiveryExpander
 				// 
 				// bSelectGameFolder
 				// 
+				this->bSelectGameFolder->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 14.25F, System::Drawing::FontStyle::Regular,
+					System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
 				this->bSelectGameFolder->Location = System::Drawing::Point(12, 12);
 				this->bSelectGameFolder->Name = L"bSelectGameFolder";
 				this->bSelectGameFolder->Size = System::Drawing::Size(160, 60);
-				this->bSelectGameFolder->TabIndex = 8;
+				this->bSelectGameFolder->TabIndex = 0;
 				this->bSelectGameFolder->Text = L"Select Base Liveries";
 				this->bSelectGameFolder->UseVisualStyleBackColor = true;
 				this->bSelectGameFolder->Click += gcnew System::EventHandler(this, &MainForm::bSelectGameFolder_Click);
 				// 
 				// bSelectModFolder
 				// 
+				this->bSelectModFolder->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 14.25F, System::Drawing::FontStyle::Regular,
+					System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
 				this->bSelectModFolder->Location = System::Drawing::Point(178, 12);
 				this->bSelectModFolder->Name = L"bSelectModFolder";
 				this->bSelectModFolder->Size = System::Drawing::Size(160, 60);
-				this->bSelectModFolder->TabIndex = 9;
+				this->bSelectModFolder->TabIndex = 1;
 				this->bSelectModFolder->Text = L"Select Mod Folder";
 				this->bSelectModFolder->UseVisualStyleBackColor = true;
 				this->bSelectModFolder->Click += gcnew System::EventHandler(this, &MainForm::bSelectModFolder_Click);
@@ -173,10 +182,12 @@ namespace DCSLiveryExpander
 				// bBackupFiles
 				// 
 				this->bBackupFiles->Enabled = false;
-				this->bBackupFiles->Location = System::Drawing::Point(12, 621);
+				this->bBackupFiles->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 14.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+					static_cast<System::Byte>(0)));
+				this->bBackupFiles->Location = System::Drawing::Point(12, 657);
 				this->bBackupFiles->Name = L"bBackupFiles";
 				this->bBackupFiles->Size = System::Drawing::Size(160, 60);
-				this->bBackupFiles->TabIndex = 10;
+				this->bBackupFiles->TabIndex = 5;
 				this->bBackupFiles->Text = L"Backup Files";
 				this->bBackupFiles->UseVisualStyleBackColor = true;
 				this->bBackupFiles->Click += gcnew System::EventHandler(this, &MainForm::bBackupFiles_Click);
@@ -184,19 +195,36 @@ namespace DCSLiveryExpander
 				// bRestoreBackups
 				// 
 				this->bRestoreBackups->Enabled = false;
-				this->bRestoreBackups->Location = System::Drawing::Point(344, 621);
+				this->bRestoreBackups->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 14.25F, System::Drawing::FontStyle::Regular,
+					System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
+				this->bRestoreBackups->Location = System::Drawing::Point(344, 657);
 				this->bRestoreBackups->Name = L"bRestoreBackups";
 				this->bRestoreBackups->Size = System::Drawing::Size(160, 60);
-				this->bRestoreBackups->TabIndex = 11;
+				this->bRestoreBackups->TabIndex = 7;
 				this->bRestoreBackups->Text = L"Restore Backups";
 				this->bRestoreBackups->UseVisualStyleBackColor = true;
 				this->bRestoreBackups->Click += gcnew System::EventHandler(this, &MainForm::bRestoreBackups_Click);
+				// 
+				// cbOverride
+				// 
+				this->cbOverride->AutoSize = true;
+				this->cbOverride->Enabled = false;
+				this->cbOverride->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 14.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+					static_cast<System::Byte>(0)));
+				this->cbOverride->Location = System::Drawing::Point(12, 623);
+				this->cbOverride->Name = L"cbOverride";
+				this->cbOverride->Size = System::Drawing::Size(270, 28);
+				this->cbOverride->TabIndex = 4;
+				this->cbOverride->Text = L"Override DCS Core Liveries\?";
+				this->cbOverride->UseVisualStyleBackColor = true;
+				this->cbOverride->CheckedChanged += gcnew System::EventHandler(this, &MainForm::cbOverride_CheckedChanged);
 				// 
 				// MainForm
 				// 
 				this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 				this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-				this->ClientSize = System::Drawing::Size(516, 693);
+				this->ClientSize = System::Drawing::Size(516, 729);
+				this->Controls->Add(this->cbOverride);
 				this->Controls->Add(this->bRestoreBackups);
 				this->Controls->Add(this->bBackupFiles);
 				this->Controls->Add(this->bSelectModFolder);
@@ -216,26 +244,33 @@ namespace DCSLiveryExpander
 			}
 		#pragma endregion
 	
+		#pragma region Helper Functions (come up with better name for the region)
 			bool SearchDirectory()
 			{
 				try
 				{
 					if (System::IO::Directory::Exists(folderName))
 					{
+						int i = 0;
 						tbFolder->Text = folderName;
 
 						array<System::String^>^ fileList = System::IO::Directory::GetFiles(folderName, "description.lua", IO::SearchOption::AllDirectories);
 
-						for (int i = 0; i < fileList->Length; i++)
+						for (i = 0; i < fileList->Length; i++)
 						{
 							listFiles->Items->Add(fileList[i]->ToString());
 						}
-						return true;
-						/*
-							TODO:
-							1. Since the folder exists we need to grab the list of description.lua files
-							2. If no files found, let user know
-						*/
+
+						//TODO: Check if the files contain country in the file
+
+						if (i > 0)
+						{
+							return true;
+						}
+						else
+						{
+							return false;
+						}
 					}
 					else
 					{
@@ -274,6 +309,7 @@ namespace DCSLiveryExpander
 				bBackupFiles->Enabled = true;
 				bMakeChanges->Enabled = true;
 				bRestoreBackups->Enabled = true;
+				cbOverride->Enabled = true;
 			}
 			/// <summary>
 			/// This function is used to reset the form back to start
@@ -287,67 +323,62 @@ namespace DCSLiveryExpander
 				bRestoreBackups->Enabled = false;
 			}
 
-
-			bool TestLocation(String^ location)
-			{
-				//TODO:fill this out
-				return false;
-			}
-
-
+			/// <summary>
+			/// Function that will parse steams libraryfolders.vdf file to determine the DCS install location
+			/// </summary>
+			/// <param name="steamPath"></param>
+			/// <returns></returns>
 			String^ GetDCSSteamLocation(String^ steamPath)
 			{
 				try
 				{
-					String^ libraryFolderText = File::ReadAllText(steamPath + "/steamapps/libraryfolder.vdf");					
-					
-					//Regex to find the drive that the steam library is located
-					String^ steamDriveRegex = "\"\\d\"[\\s]*{[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*\"223750\"[\\s]*\"[0-9]*\"[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*}";
+					String^ configLocation = "";
+					if (Directory::Exists(steamPath + "/steamapps/"))
+					{
+						String^ libraryFolderText = File::ReadAllText(steamPath + "/steamapps/libraryfolders.vdf");
 
-					RegularExpressions::Match^ drive = RegularExpressions::Regex::Match(libraryFolderText, steamDriveRegex);
+						//Regex to find the drive that the steam library is located
+						String^ steamDriveRegex = "\"\\d\"[\\s]*{[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*\"223750\"[\\s]*\"[0-9]*\"[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*}";
 
-					//Regex to get the path line of the steam library
-					String^ steamLibraryRegex = "\"path\"[\\s]*[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*(Steam|SteamLibrary)\"";
-					
-					RegularExpressions::Match^ path = RegularExpressions::Regex::Match(drive->Value, steamLibraryRegex);
+						RegularExpressions::Match^ drive = RegularExpressions::Regex::Match(libraryFolderText, steamDriveRegex);
 
-					//Regex to extract out the actual path
-					String^ libraryLocationRegex = "\"\\w:[\\w\\d\\\\\\s\\(\\)\\\"]*\"";
+						//Regex to get the path line of the steam library
+						String^ steamLibraryRegex = "\"path\"[\\s]*[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*(Steam|SteamLibrary)\"";
 
-					RegularExpressions::Match^ folderLocation = RegularExpressions::Regex::Match(path->Value, libraryLocationRegex);
+						RegularExpressions::Match^ path = RegularExpressions::Regex::Match(drive->Value, steamLibraryRegex);
 
-					String^ gameLocation = folderLocation->Value->Trim('\"') + "steamapps/common/DCSWorld/Config/";
-					
+						//Regex to extract out the actual path
+						String^ libraryLocationRegex = "\"\\w:[\\w\\d\\\\\\s\\(\\)\\\"]*\"";
 
+						RegularExpressions::Match^ folderLocation = RegularExpressions::Regex::Match(path->Value, libraryLocationRegex);
 
-					/*
-						After getting the game location we need to check to make sure that the folder actually exists
-					
-						call TestLocation to determine if the file exists
-					
-					*/
+						//Trim any double quotes and fix the extra backslashes coming in from the libraryfolders file
+						configLocation = folderLocation->Value->Trim('\"')->Replace("\\\\", "\\") + "\\steamapps\\common\\DCSWorld\\Config\\Liveries";
+
+						//TODO: verify that this is where the actual Liveries file is installed to
+					}
 
 
+					//Now we check to ensure that the location we retrieved actually exists
+					if (!String::IsNullOrWhiteSpace(configLocation))
+					{
+						if(Directory::Exists(configLocation))
+							return configLocation;
+					}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+					return "";
 				}
 				catch (Exception^ ex)
 				{
-
+					MessageBox::Show("There was an exception when getting the DCS Steam Location:\n\n" + ex->ToString());
+					return "";
 				}
 			}
+
+		#pragma endregion
+
+		#pragma region Windows Forms Event Handlers
+
 
 			System::Void bSelectGameFolder_Click(System::Object^ sender, System::EventArgs^ e)
 			{
@@ -366,17 +397,7 @@ namespace DCSLiveryExpander
 
 					/*
 						check if (library + "steamapps/common/DCSWorld") exists;
-					
-						
-
-						Should a button or checkbox be added to ask if the coremods aircraft should be modified?
-							- would only affect the install location files
-
-
-
-
-
-					
+										
 					
 					*/
 
@@ -408,6 +429,7 @@ namespace DCSLiveryExpander
 					ResetForm();
 				}
 			}
+			
 			System::Void bSelectModFolder_Click(System::Object^ sender, System::EventArgs^ e)
 			{
 				//This will get the userprofiles/Saved Games/DCS/Liveries folder
@@ -427,6 +449,10 @@ namespace DCSLiveryExpander
 					if (SearchDirectory())
 					{
 						EnableButtons();
+					}
+					else
+					{
+						ResetForm();
 					}
 				}
 			}
@@ -464,5 +490,10 @@ namespace DCSLiveryExpander
 				*/
 				ResetForm();
 			}
-	};
+			System::Void cbOverride_CheckedChanged(System::Object^ sender, System::EventArgs^ e)
+			{
+			}
+			
+		#pragma endregion
+};
 }
