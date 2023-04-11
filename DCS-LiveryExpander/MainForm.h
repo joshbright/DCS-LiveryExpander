@@ -245,6 +245,24 @@ namespace DCSLiveryExpander
 		#pragma endregion
 	
 		#pragma region Helper Functions (come up with better name for the region)
+			
+			bool CountryLineExists(String^ filePath)
+			{
+				String^ libraryFolderText = File::ReadAllText(filePath);
+
+				//Regex to find the countries line
+				String^ countryRegex = "countries\\s?=\\s?{[\"a-zA-Z,\\s]*}";
+
+				RegularExpressions::Match^ countryLine = RegularExpressions::Regex::Match(libraryFolderText, countryRegex);
+
+
+				//TODO: Now we need to check to see if we got anything back
+
+
+
+
+			}
+			
 			bool SearchDirectory()
 			{
 				try
@@ -258,19 +276,11 @@ namespace DCSLiveryExpander
 
 						for (i = 0; i < fileList->Length; i++)
 						{
-							listFiles->Items->Add(fileList[i]->ToString());
+							if(CountryLineExists(fileList[i]->ToString()))
+								listFiles->Items->Add(fileList[i]->ToString());
 						}
 
-						//TODO: Check if the files contain country in the file
-
-						if (i > 0)
-						{
-							return true;
-						}
-						else
-						{
-							return false;
-						}
+						return (i > 0);
 					}
 					else
 					{
@@ -335,6 +345,11 @@ namespace DCSLiveryExpander
 					String^ configLocation = "";
 					if (Directory::Exists(steamPath + "/steamapps/"))
 					{
+
+
+						//TODO: It would be a good idea to verify that the matches actually return something
+
+
 						String^ libraryFolderText = File::ReadAllText(steamPath + "/steamapps/libraryfolders.vdf");
 
 						//Regex to find the drive that the steam library is located
