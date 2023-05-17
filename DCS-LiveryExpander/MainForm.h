@@ -360,6 +360,28 @@ namespace DCSLiveryExpander
 				bMakeChanges->Enabled = false;
 				bRestoreBackups->Enabled = false;
 			}
+
+
+			String^ VerifyLocation(String^ locationPath)
+			{
+				try
+				{
+					//Now we check to ensure that the location we retrieved actually exists
+					if (!String::IsNullOrWhiteSpace(locationPath))
+					{
+						if (Directory::Exists(locationPath))
+							return locationPath;
+					}
+
+					return "";
+				}
+				catch (Exception^ ex)
+				{
+					MessageBox::Show("There was an exception when validating the following location: " + locationPath + "\n\n" + ex->ToString());
+					return "";
+				}
+			}
+
 			/// <summary>
 			/// Function that will parse steams libraryfolders.vdf file to determine the DCS install location
 			/// </summary>
@@ -400,15 +422,8 @@ namespace DCSLiveryExpander
 						//TODO: verify that this is where the actual Liveries file is installed to
 					}
 
+					return VerifyLocation(configLocation);
 
-					//Now we check to ensure that the location we retrieved actually exists
-					if (!String::IsNullOrWhiteSpace(configLocation))
-					{
-						if(Directory::Exists(configLocation))
-							return configLocation;
-					}
-
-					return "";
 				}
 				catch (Exception^ ex)
 				{
@@ -416,6 +431,7 @@ namespace DCSLiveryExpander
 					return "";
 				}
 			}
+
 
 		#pragma endregion
 
@@ -426,27 +442,43 @@ namespace DCSLiveryExpander
 			{
 				try
 				{
+					String^ steamDCSLocation = "";
+					String^ dcsLocation = "";
+					String^ dcsBetaLocation = "";
 					//We will want to read the registry keys to get the steam/DCS folder
 
 					//Look for standalone DCS installation
 
-					String^ steamInstallLocation = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", "")->ToString();
-					String^ steamDCSLocation = GetDCSSteamLocation(steamInstallLocation);
-					
-					String^ dcsInstallLocation = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World", "Path", "")->ToString();
-					String^ dcsBetaInstallLocation = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World OpenBeta", "Path", "")->ToString();
-					
-
-					/*
-						check if (library + "steamapps/common/DCSWorld") exists;
-										
-					
-					*/
+					//Registry steamInstallKey = 
+					//Registry dcsInstallKey =
 
 
+
+					String^ steamInstallRegistry = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", "NotFound")->ToString();
+					String^ dcsInstallRegistry = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World", "Path", "NotFound")->ToString();
+					String^ dcsBetaInstallRegistry = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World OpenBeta", "Path", "NotFound")->ToString();
+
+					bool steamRegistryFound = String::Equals(steamInstallRegistry, "NotFound");
+					bool dcsRegistryFound = String::Equals(dcsInstallRegistry, "NotFound");
+					bool dcsBetaRegistryFound = String::Equals(dcsBetaInstallRegistry, "NotFound");
+
+					if (steamRegistryFound)
+					{
+						steamDCSLocation = GetDCSSteamLocation(steamInstallRegistry);
+					}
+					
+					if (dcsRegistryFound)
+					{
+						dcsLocation = VerifyLocation(dcsInstallRegistry);
+					}
+
+					if (dcsBetaRegistryFound)
+					{
+						dcsBetaLocation = VerifyLocation(dcsBetaInstallRegistry);
+					}
 
 					//Error handling will need to be improved
-					if (String::IsNullOrWhiteSpace(dcsInstallLocation) || String::IsNullOrWhiteSpace(dcsBetaInstallLocation) || String::IsNullOrWhiteSpace(steamInstallLocation))
+					if (String::IsNullOrWhiteSpace(steamDCSLocation) || String::IsNullOrWhiteSpace(dcsLocation) || String::IsNullOrWhiteSpace(dcsBetaLocation))
 					{
 
 					}
