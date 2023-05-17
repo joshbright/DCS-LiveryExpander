@@ -255,11 +255,10 @@ namespace DCSLiveryExpander
 
 				RegularExpressions::Match^ countryLine = RegularExpressions::Regex::Match(libraryFolderText, countryRegex);
 
+				if (countryLine->Success)
+					return true;
 
-				//TODO: Now we need to check to see if we got anything back
-
-
-
+				return false;
 
 			}
 			
@@ -284,6 +283,7 @@ namespace DCSLiveryExpander
 					}
 					else
 					{
+						//TODO: Display message that directory doesn't exist?
 						return false;
 					}
 				}
@@ -297,10 +297,38 @@ namespace DCSLiveryExpander
 
 			bool BackupOriginalFiles()
 			{
-				//Take the file list and copy them to descriptionBak.luaBak
+				try
+				{
+					for (int i = 0; i < listFiles->Items->Count; i++)
+					{
+						String^ luaFile = listFiles->Items[i]->ToString();
+						FileInfo^ filePath = gcnew FileInfo(luaFile);
+
+						//TODO: consider more validation prior to copying
+
+
+						//TODO: Test this 
+						File::Copy(luaFile, filePath->Directory + "descriptionBAK.luaBAK");
+
+					}
+					//Take the file list and copy them to descriptionBak.luaBak
+					return false;
+				}
+				catch (Exception^ ex)
+				{
+					//TODO: Fill out this exception to be more clear.
+					MessageBox::Show(ex->ToString());
+					return false;
+				}
+			}
+
+			//This function will be used to determine if backups exist.
+			bool DoBackupsExist()
+			{
 				return false;
 			}
 
+			//do I still need this?
 			bool ModifyFiles()
 			{
 				return false;
@@ -332,7 +360,6 @@ namespace DCSLiveryExpander
 				bMakeChanges->Enabled = false;
 				bRestoreBackups->Enabled = false;
 			}
-
 			/// <summary>
 			/// Function that will parse steams libraryfolders.vdf file to determine the DCS install location
 			/// </summary>
@@ -454,6 +481,7 @@ namespace DCSLiveryExpander
 			//Should verify to ensure that this is functioning
 			System::Void bSelectFolder_Click(System::Object^ sender, System::EventArgs^ e)
 			{
+				//TODO: try catch
 				ResetForm();
 				System::Windows::Forms::DialogResult result = folderBrowserDialog1->ShowDialog();
 
@@ -473,6 +501,8 @@ namespace DCSLiveryExpander
 			}
 			System::Void bBackupFiles_Click(System::Object^ sender, System::EventArgs^ e)
 			{
+				//TODO: try catch
+				//TODO: DoBackupsExist? Do we want to overwrite?
 				if (BackupOriginalFiles())
 				{
 					//Display Success Message
@@ -507,6 +537,25 @@ namespace DCSLiveryExpander
 			}
 			System::Void cbOverride_CheckedChanged(System::Object^ sender, System::EventArgs^ e)
 			{
+				/*
+				Do we want to keep this function and associated checkbox?
+
+				TODO:
+				1. Check if there are two different folders in the DCS install location for core vs user mods
+				2. If there is, keep this check box and implement it at some point. Otherwise remove
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				*/
 			}
 			
 		#pragma endregion
