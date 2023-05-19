@@ -9,14 +9,18 @@ ref class FileInfo
 		System::String^ installRegistryKey;
 		bool registryFound;
 		cliext::vector<System::String^> files;
-		void GetInstallRegistry();
-		void GetInstallLocation();
-		void VerifyInstallLocation();
+		//void GetInstallRegistry();
+		//void GetInstallLocation();
+		//void VerifyInstallLocation();
 	public:
-		bool registryFound();
-		cliext::vector<System::String^> getFiles();
+		//bool GetRegistryFound();
+		//cliext::vector<System::String^> getFiles();
 };
-
+/*
+*  Note: Commented this out so everything can compile until I get back to this
+* 
+* 
+* 
 ref class SteamInfo : FileInfo
 {
 	private:
@@ -42,4 +46,4 @@ ref class DCSBetaInfo : FileInfo
 		const System::String^ installRegistryKey = "Path";
 	public:
 		DCSBetaInfo();
-};
+};*/
