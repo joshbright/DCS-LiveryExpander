@@ -387,7 +387,6 @@ namespace DCSLiveryExpander
 
 						//TODO: we will want more validation prior to copying
 						//TODO: Check for existing backups first
-
 						File::Copy(luaFile, filePath->Directory + "\\descriptionBAK.luaBAK");
 
 					}
@@ -661,26 +660,27 @@ namespace DCSLiveryExpander
 
 				if (DoBackupsExist())
 				{
-					//TODO: Throw up a message and ask if they want to overwrite the backups or stop
-					/*
-					*	something like this?
-						if(overwrite)
-						{
-							delete the old backups first
-						}
-						else
-						{
-							return;
-						}
 					
-					
-					*/
+					Windows::Forms::DialogResult result = MessageBox::Show(this, 
+						"Existing Backups were found, remove them?",
+						"Remove Existing Backups?",
+						MessageBoxButtons::YesNo
+					);
+
+					if (result == Windows::Forms::DialogResult::Yes)
+					{
+						//TODO:Delete the backups
+					}
+					else
+					{
+						return;
+					}
 				}
 
 				if (BackupOriginalFiles())
 				{
-					MessageBox::Show("The files have been successfully backed up!");
 					//Display Success Message
+					MessageBox::Show("The files have been successfully backed up!");
 				}
 				else
 				{
