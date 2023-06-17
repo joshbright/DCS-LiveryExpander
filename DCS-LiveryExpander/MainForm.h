@@ -37,6 +37,9 @@ namespace DCSLiveryExpander
 			}
 		private:
 			const int dcsSteamID = 223750;
+			String^ folderName;
+			DateTime^ currentDate = DateTime::Now;
+			String^ logFileName = "DCSLE_Log" + (currentDate->ToString("yyyyMMdd")) + ".log";
 			System::Windows::Forms::Button^ bSelectFolder;
 			System::Windows::Forms::Button^ bMakeChanges;
 			System::Windows::Forms::ListBox^ listFiles;
@@ -44,10 +47,8 @@ namespace DCSLiveryExpander
 			System::Windows::Forms::Label^ label1;
 			System::Windows::Forms::Label^ label2;
 			System::Windows::Forms::FolderBrowserDialog^ folderBrowserDialog1;
-			String^ folderName;
 			System::Windows::Forms::Label^ label3;
 			System::Windows::Forms::Button^ bSelectGameFolder;
-
 			System::Windows::Forms::Button^ bSelectModFolder;
 			System::Windows::Forms::Button^ bBackupFiles;
 			System::Windows::Forms::Button^ bRestoreBackups;
@@ -55,7 +56,6 @@ namespace DCSLiveryExpander
 			System::Windows::Forms::TableLayoutPanel^ tableLayoutPanel1;
 			System::Windows::Forms::TableLayoutPanel^ tableLayoutPanel3;
 			System::Windows::Forms::TableLayoutPanel^ tableLayoutPanel2;
-
 
 
 
@@ -325,21 +325,48 @@ namespace DCSLiveryExpander
 		#pragma endregion
 	
 		#pragma region Helper Functions (come up with better name for the region)
-			
+
+			//This function should be used during exception messages
+			void LogException(Exception^ ex, String^ message)
+			{
+				try
+				{
+					StreamWriter^ sw = gcnew StreamWriter(logFileName);
+					sw->WriteLine("---------------Error---------------");
+					sw->WriteLine(message);
+					sw->WriteLine("*************Exception*************");
+					sw->WriteLine(ex->ToString());
+					sw->WriteLine("-----------------------------------");
+					sw->Close();
+
+					MessageBox::Show("An error occured! Please view " + logFileName + " for more information.");
+				}
+				catch (Exception^ ex)
+				{
+					MessageBox::Show("An error occured while logging an error! \n" + ex->ToString());
+				}
+			}
+
 			bool CountryLineExists(String^ filePath)
 			{
-				String^ libraryFolderText = File::ReadAllText(filePath);
+				try
+				{
+					String^ libraryFolderText = File::ReadAllText(filePath);
 
-				//Regex to find the countries line
-				String^ countryRegex = "countries\\s?=\\s?{[\"a-zA-Z,\\s]*}";
+					//Regex to find the countries line
+					String^ countryRegex = "countries\\s?=\\s?{[\"a-zA-Z,\\s]*}";
 
-				RegularExpressions::Match^ countryLine = RegularExpressions::Regex::Match(libraryFolderText, countryRegex);
+					RegularExpressions::Match^ countryLine = RegularExpressions::Regex::Match(libraryFolderText, countryRegex);
 
-				if (countryLine->Success)
-					return true;
+					if (countryLine->Success)
+						return true;
 
-				return false;
-
+					return false;
+				}
+				catch (Exception^ ex)
+				{
+					LogException(ex, "An error occured while attempting to search for the country line in the following file: " + filePath);
+				}
 			}
 			
 			bool SearchDirectory()
@@ -359,7 +386,11 @@ namespace DCSLiveryExpander
 								listFiles->Items->Add(fileList[i]->ToString());
 						}
 
-						return (i > 0);
+						if (i > 0)
+							return true;
+						else
+							MessageBox::Show("No description.lua files were found!");
+						return false;
 					}
 					else
 					{
@@ -369,8 +400,30 @@ namespace DCSLiveryExpander
 				}
 				catch (Exception^ ex)
 				{
-					//TODO: Fill out this exception. I'm not sure how anyone would ever get here
-					MessageBox::Show(ex->ToString());
+					LogException(ex, "An error occured while attempting to search the following directory: " + folderName);
+					return false;
+				}
+			}
+
+			//This function will be used to determine if backups exist.
+			bool DoBackupsExist()
+			{
+				try
+				{
+					for (int i = 0; i < listFiles->Items->Count; i++)
+					{
+						String^ luaFile = listFiles->Items[i]->ToString();
+						FileInfo^ filePath = gcnew FileInfo(luaFile);
+
+						if (!File::Exists(filePath->Directory + "\\descriptionBAK.luaBAK"))
+							return false;
+
+					}
+					return true;
+				}
+				catch (Exception^ ex)
+				{
+					LogException(ex, "An error occured while attempting to search for backups.");
 					return false;
 				}
 			}
@@ -396,30 +449,28 @@ namespace DCSLiveryExpander
 				}
 				catch (Exception^ ex)
 				{
-					//TODO: Fill out this exception to be more clear.
-					MessageBox::Show(ex->ToString());
+					LogException(ex, "An error occured while attempting to create backups for the description.lua files.");
 					return false;
 				}
 			}
 
-			//This function will be used to determine if backups exist.
-			bool DoBackupsExist()
+			bool DeleteOldBackups()
 			{
 				try
 				{
-					for (int i = 0; i < listFiles->Items->Count; i++)
+					String^ tester = "";
+					Generic::IEnumerable<String^>^ fileList = Directory::EnumerateFiles(folderName, "*.luaBAK", SearchOption::AllDirectories);
+
+					for each (String ^ fileName in fileList)
 					{
-						String^ luaFile = listFiles->Items[i]->ToString();
-						FileInfo^ filePath = gcnew FileInfo(luaFile);
-
-						if (!File::Exists(filePath->Directory + "\\descriptionBAK.luaBAK"))
-							return false;
-
+						File::Delete(fileName);
 					}
+
 					return true;
 				}
 				catch (Exception^ ex)
 				{
+					LogException(ex, "An error occured while attempting to delete the old backups.");
 					return false;
 				}
 			}
@@ -444,6 +495,7 @@ namespace DCSLiveryExpander
 				catch (Exception^ ex)
 				{
 					//TODO:Maybe we want to clear stuff out if it fails at this step?
+					LogException(ex, "An error occured while attempting to determine which files failed to be backed up.");
 					return faledBackups;
 				}
 			}
@@ -497,7 +549,7 @@ namespace DCSLiveryExpander
 				}
 				catch (Exception^ ex)
 				{
-					MessageBox::Show("There was an exception when validating the following location: " + locationPath + "\n\n" + ex->ToString());
+					LogException(ex, "An error occured while attempting to verify the following location: " + locationPath);
 					return "";
 				}
 			}
@@ -522,7 +574,7 @@ namespace DCSLiveryExpander
 						String^ libraryFolderText = File::ReadAllText(steamPath + "/steamapps/libraryfolders.vdf");
 
 						//Regex to find the drive that the steam library is located
-						String^ steamDriveRegex = "\"\\d\"[\\s]*{[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*\"223750\"[\\s]*\"[0-9]*\"[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*}";
+						String^ steamDriveRegex = "\"\\d\"[\\s]*{[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*\""+dcsSteamID+"\"[\\s]*\"[0-9]*\"[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*}";
 
 						RegularExpressions::Match^ drive = RegularExpressions::Regex::Match(libraryFolderText, steamDriveRegex);
 
@@ -547,7 +599,7 @@ namespace DCSLiveryExpander
 				}
 				catch (Exception^ ex)
 				{
-					MessageBox::Show("There was an exception when getting the DCS Steam Location:\n\n" + ex->ToString());
+					LogException(ex, "An error occured while attempting to retreive the DCS Steam Location");
 					return "";
 				}
 			}
@@ -573,10 +625,17 @@ namespace DCSLiveryExpander
 					//Registry dcsInstallKey =
 
 
+					//We are getting the registry keys as objects separate so we can verify they exist before doing ToString()
+					Object^ steamRegistryObject = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", "NotFound");
+					Object^ dcsRegistryObject = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World", "Path", "NotFound");
+					Object^ dcsBetaRegistryObject = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World OpenBeta", "Path", "NotFound");
 
-					String^ steamInstallRegistry = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", "NotFound")->ToString();
-					String^ dcsInstallRegistry = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World", "Path", "NotFound")->ToString();
-					String^ dcsBetaInstallRegistry = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World OpenBeta", "Path", "NotFound")->ToString();
+
+
+
+					String^ steamInstallRegistry = (steamRegistryObject == nullptr ? "NotFound" : steamRegistryObject->ToString());
+					String^ dcsInstallRegistry = (dcsRegistryObject == nullptr ? "NotFound" : dcsRegistryObject->ToString());
+					String^ dcsBetaInstallRegistry = (dcsBetaRegistryObject == nullptr ? "NotFound" : dcsBetaRegistryObject->ToString());
 
 					bool steamRegistryFound = String::Equals(steamInstallRegistry, "NotFound");
 					bool dcsRegistryFound = String::Equals(dcsInstallRegistry, "NotFound");
@@ -619,7 +678,7 @@ namespace DCSLiveryExpander
 				}
 				catch (Exception^ ex)
 				{
-					MessageBox::Show("There was an exception when reading the registry key: " + ex->ToString());
+					LogException(ex, "An error occured while attempting to retreive the game install information");
 					ResetForm();
 				}
 			}
@@ -633,22 +692,29 @@ namespace DCSLiveryExpander
 			//Should verify to ensure that this is functioning
 			System::Void bSelectFolder_Click(System::Object^ sender, System::EventArgs^ e)
 			{
-				//TODO: try catch
-				ResetForm();
-				System::Windows::Forms::DialogResult result = folderBrowserDialog1->ShowDialog();
-
-				if (result == System::Windows::Forms::DialogResult::OK)
+				try
 				{
-					folderName = folderBrowserDialog1->SelectedPath;
+					ResetForm();
+					System::Windows::Forms::DialogResult result = folderBrowserDialog1->ShowDialog();
 
-					if (SearchDirectory())
+					if (result == System::Windows::Forms::DialogResult::OK)
 					{
-						EnableButtons();
+						folderName = folderBrowserDialog1->SelectedPath;
+
+						if (SearchDirectory())
+						{
+							EnableButtons();
+						}
+						else
+						{
+							ResetForm();
+						}
 					}
-					else
-					{
-						ResetForm();
-					}
+				}
+				catch (Exception^ ex)
+				{
+					LogException(ex, "An error occured during the selection of the custom folder");
+					ResetForm();
 				}
 			}
 			System::Void bBackupFiles_Click(System::Object^ sender, System::EventArgs^ e)
@@ -656,39 +722,50 @@ namespace DCSLiveryExpander
 				//TODO: try catch
 				//TODO: DoBackupsExist? Do we want to overwrite?
 
-
-
-				if (DoBackupsExist())
+				try
 				{
-					
-					Windows::Forms::DialogResult result = MessageBox::Show(this, 
-						"Existing Backups were found, remove them?",
-						"Remove Existing Backups?",
-						MessageBoxButtons::YesNo
-					);
-
-					if (result == Windows::Forms::DialogResult::Yes)
+					if (DoBackupsExist())
 					{
-						//TODO:Delete the backups
+
+						Windows::Forms::DialogResult result = MessageBox::Show(this,
+							"Existing Backups were found, remove them?",
+							"Remove Existing Backups?",
+							MessageBoxButtons::YesNo
+						);
+
+						if (result == Windows::Forms::DialogResult::Yes)
+						{
+							//if we failed deleting some of the backups we want to back out
+							if (!DeleteOldBackups())
+							{
+								return;
+							}
+						}
+						else
+						{
+							return;
+						}
+					}
+
+					if (BackupOriginalFiles())
+					{
+						//Display Success Message
+						MessageBox::Show("The files have been successfully backed up!");
 					}
 					else
 					{
-						return;
+						cliext::vector<String^> problemBackups = WhichBackupsFailed();
+
+						//TODO: Ask if they want to continue, if so remove the items from the list that are bad
+						//Display Error Message
 					}
 				}
-
-				if (BackupOriginalFiles())
+				catch (Exception^ ex)
 				{
-					//Display Success Message
-					MessageBox::Show("The files have been successfully backed up!");
+					LogException(ex, "An error occured in the logic for the backup button.");
 				}
-				else
-				{
-					cliext::vector<String^> problemBackups = WhichBackupsFailed();
 
-					//TODO: Ask if they want to continue, if so remove the items from the list that are bad
-					//Display Error Message
-				}
+				
 			}
 			System::Void bMakeChanges_Click(System::Object^ sender, System::EventArgs^ e)
 			{
@@ -721,18 +798,6 @@ namespace DCSLiveryExpander
 				TODO:
 				1. Check if there are two different folders in the DCS install location for core vs user mods
 				2. If there is, keep this check box and implement it at some point. Otherwise remove
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
 				*/
 			}
 			
