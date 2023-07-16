@@ -11,7 +11,7 @@ using namespace System::Text;
 
 void RegistryInfo::FindInstallRegistry()
 {
-	Object^ registryObject = Registry::GetValue(installRegistryPath, installRegistryKey, "NotFound");
+	Object^ registryObject = Registry::GetValue(this->installRegistryLocation, this->installRegistryKey, "NotFound");
 
 	//If the registry location doesn't exist it will return a nullptr. We want to make sure that is handled
 	installRegistryLocation = (registryObject == nullptr ? "NotFound" : registryObject->ToString());
@@ -26,19 +26,23 @@ String^ RegistryInfo::VerifyInstallLocation(String^ installedLocation)
 {
 	try
 	{
+		locationExists = false;
 		//Now we check to ensure that the location we retrieved actually exists
 		if (!String::IsNullOrWhiteSpace(installedLocation))
 		{
 			if (Directory::Exists(installedLocation))
+			{
+				locationExists = true;
 				return installedLocation;
+			}
 		}
-
 		return "";
 	}
 	catch (Exception^ ex)
 	{
 		//TODO Fill out this exception
 		//LogException(ex, "An error occured while attempting to verify the following location: " + installedLocation);
+		locationExists = false;
 		return "";
 	}
 }
@@ -62,22 +66,25 @@ void RegistryInfo::FindInstallLocation()
 	}
 }
 
-
-cliext::vector<String^> RegistryInfo::getFiles()
+String^ RegistryInfo::GetLocationPath()
 {
-	
+	return locationPath;
+}
+
+bool RegistryInfo::GetLocationExists()
+{
+	return locationExists;
+}
+
+cliext::vector<String^> RegistryInfo::GetFiles()
+{
+	cliext::vector<String^> test;
+	return test;
 }
 
 #pragma endregion
 
 #pragma region SteamInfo
-
-SteamInfo::SteamInfo()
-{
-	FindInstallRegistry();
-	CalculateRegistryFound();
-	FindInstallLocation();
-}
 
 /// <summary>
 /// Function that will parse steams libraryfolders.vdf file to determine the DCS install location
@@ -133,27 +140,3 @@ void SteamInfo::FindInstallLocation()
 		locationPath = "";
 	}
 }
-
-#pragma endregion
-
-#pragma region DCSInfo
-
-DCSInfo::DCSInfo()
-{
-	FindInstallRegistry();
-	CalculateRegistryFound();
-	FindInstallLocation();
-}
-
-#pragma endregion
-
-#pragma region DCSBetaInfo
-
-DCSBetaInfo::DCSBetaInfo()
-{
-	FindInstallRegistry();
-	CalculateRegistryFound();
-	FindInstallLocation();
-}
-
-#pragma endregion

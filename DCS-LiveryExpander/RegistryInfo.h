@@ -10,42 +10,64 @@ ref class RegistryInfo
 		System::String^ locationPath;
 		cliext::vector<System::String^> files;
 		bool registryFound;
-
+		bool locationExists;
 		void FindInstallRegistry();
 		void CalculateRegistryFound();
 		virtual void FindInstallLocation();
 		System::String^ VerifyInstallLocation(System::String^ installedLocation);
 
 	public:
-		cliext::vector<System::String^> getFiles();
+		RegistryInfo(System::String^ installRegistryLocation, System::String^ installRegistryKey)
+		{
+			this->installRegistryLocation = installRegistryLocation;
+			this->installRegistryKey = installRegistryKey;
+		};
+		System::String^ GetLocationPath();
+		bool GetLocationExists();
+		cliext::vector<System::String^> GetFiles();
 };
 
 ref class SteamInfo : RegistryInfo
 {
 	private:
-		const System::String^ installRegistryLocation = "HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam";
-		const System::String^ installRegistryKey = "SteamPath";
+		System::String^ installRegistryLocation = "HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam";
+		System::String^ installRegistryKey = "SteamPath";
 		const int dcsSteamID = 223750;
 	protected:
 		void FindInstallLocation() override;
 	public:
-		SteamInfo();
+		SteamInfo() : RegistryInfo(installRegistryLocation, installRegistryKey)
+		{
+			FindInstallRegistry();
+			CalculateRegistryFound();
+			FindInstallLocation();
+		};
 };
 
 ref class DCSInfo : RegistryInfo
 {
 	private:
-		const System::String^ installRegistryLocation = "HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World";
-		const System::String^ installRegistryKey = "Path";
+		System::String^ installRegistryLocation = "HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World";
+		System::String^ installRegistryKey = "Path";
 	public:
-		DCSInfo();
+		DCSInfo() : RegistryInfo(installRegistryLocation, installRegistryKey)
+		{
+			FindInstallRegistry();
+			CalculateRegistryFound();
+			FindInstallLocation();
+		};
 };
 
 ref class DCSBetaInfo : RegistryInfo
 {
 	private: 
-		const System::String^ installRegistryLocation = "HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World OpenBeta";
-		const System::String^ installRegistryKey = "Path";
+		System::String^ installRegistryLocation = "HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World OpenBeta";
+		System::String^ installRegistryKey = "Path";
 	public:
-		DCSBetaInfo();
+		DCSBetaInfo() : RegistryInfo(installRegistryLocation, installRegistryKey)
+		{
+			FindInstallRegistry();
+			CalculateRegistryFound();
+			FindInstallLocation();
+		};
 };

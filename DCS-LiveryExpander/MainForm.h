@@ -1,6 +1,8 @@
 #pragma once
 #include <cliext/vector>
 #include "RegistryInfo.h"
+#include "MainForm.h"
+#include "GameSelect.h"
 
 namespace DCSLiveryExpander
 {
@@ -58,6 +60,8 @@ namespace DCSLiveryExpander
 			System::Windows::Forms::TableLayoutPanel^ tableLayoutPanel3;
 			System::Windows::Forms::TableLayoutPanel^ tableLayoutPanel2;
 
+			//This will subscribe the main form to the event in GameSelect
+			//GameSelect::OnButtonSelection += 
 
 
 			/// <summary>
@@ -332,7 +336,7 @@ namespace DCSLiveryExpander
 			{
 				try
 				{
-					StreamWriter^ sw = gcnew StreamWriter(logFileName);
+					StreamWriter^ sw = File::AppendText(logFileName);
 					sw->WriteLine("---------------Error---------------");
 					sw->WriteLine(message);
 					sw->WriteLine("*************Exception*************");
@@ -570,7 +574,7 @@ namespace DCSLiveryExpander
 					DCSInfo^ dcsInfo = gcnew DCSInfo;
 					DCSBetaInfo^ dcsBetaInfo = gcnew DCSBetaInfo;
 
-
+					
 
 
 					//TODO WE ARE HERE AND THIS IS WHAT YOU ARE WORKING ON
@@ -579,17 +583,19 @@ namespace DCSLiveryExpander
 
 
 					//TODO Error handling will need to be improved
-					if (String::IsNullOrWhiteSpace(steamDCSLocation) || String::IsNullOrWhiteSpace(dcsLocation) || String::IsNullOrWhiteSpace(dcsBetaLocation))
+					if (steamInfo->GetLocationExists() || dcsInfo->GetLocationExists() || dcsBetaInfo->GetLocationExists())
 					{
-						MessageBox::Show("No DCS installations were found in registry, use the Custom Folder if this is in error");
+						GameSelect gameSelectForm;
+						gameSelectForm.Show();
 					}
 					else
 					{
+						MessageBox::Show("No DCS installations were found in registry, use the Custom Folder to navigate to the DCS folder");
+						ResetForm();
 						//Report that no paths could be found
 					}
 
 
-					ResetForm();
 				}
 				catch (Exception^ ex)
 				{
