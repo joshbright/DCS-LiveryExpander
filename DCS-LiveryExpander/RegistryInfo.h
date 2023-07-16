@@ -1,36 +1,38 @@
 #pragma once
 #include <cliext/vector>
 
-ref class FileInfo
+ref class RegistryInfo
 {
 	protected:
-		System::String^ location;
-		System::String^ installRegistryLocation;
+		System::String^ installRegistryPath;
 		System::String^ installRegistryKey;
-		bool registryFound;
+		System::String^ installRegistryLocation;
+		System::String^ locationPath;
 		cliext::vector<System::String^> files;
-		//void GetInstallRegistry();
-		//void GetInstallLocation();
-		//void VerifyInstallLocation();
+		bool registryFound;
+
+		void FindInstallRegistry();
+		void CalculateRegistryFound();
+		virtual void FindInstallLocation();
+		System::String^ VerifyInstallLocation(System::String^ installedLocation);
+
 	public:
-		//bool GetRegistryFound();
-		//cliext::vector<System::String^> getFiles();
+		cliext::vector<System::String^> getFiles();
 };
-/*
-*  Note: Commented this out so everything can compile until I get back to this
-* 
-* 
-* 
-ref class SteamInfo : FileInfo
+
+ref class SteamInfo : RegistryInfo
 {
 	private:
 		const System::String^ installRegistryLocation = "HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam";
 		const System::String^ installRegistryKey = "SteamPath";
+		const int dcsSteamID = 223750;
+	protected:
+		void FindInstallLocation() override;
 	public:
 		SteamInfo();
 };
 
-ref class DCSInfo : FileInfo
+ref class DCSInfo : RegistryInfo
 {
 	private:
 		const System::String^ installRegistryLocation = "HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World";
@@ -39,11 +41,11 @@ ref class DCSInfo : FileInfo
 		DCSInfo();
 };
 
-ref class DCSBetaInfo : FileInfo
+ref class DCSBetaInfo : RegistryInfo
 {
 	private: 
 		const System::String^ installRegistryLocation = "HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World OpenBeta";
 		const System::String^ installRegistryKey = "Path";
 	public:
 		DCSBetaInfo();
-};*/
+};

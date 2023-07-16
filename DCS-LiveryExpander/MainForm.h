@@ -1,5 +1,7 @@
 #pragma once
 #include <cliext/vector>
+#include "RegistryInfo.h"
+
 namespace DCSLiveryExpander
 {
 
@@ -36,7 +38,6 @@ namespace DCSLiveryExpander
 				}
 			}
 		private:
-			const int dcsSteamID = 223750;
 			String^ folderName;
 			DateTime^ currentDate = DateTime::Now;
 			String^ logFileName = "DCSLE_Log" + (currentDate->ToString("yyyyMMdd")) + ".log";
@@ -554,55 +555,6 @@ namespace DCSLiveryExpander
 				}
 			}
 
-			/// <summary>
-			/// Function that will parse steams libraryfolders.vdf file to determine the DCS install location
-			/// </summary>
-			/// <param name="steamPath"></param>
-			/// <returns></returns>
-			String^ GetDCSSteamLocation(String^ steamPath)
-			{
-				try
-				{
-					String^ configLocation = "";
-					if (Directory::Exists(steamPath + "/steamapps/"))
-					{
-
-
-						//TODO: It would be a good idea to verify that the matches actually return something
-
-
-						String^ libraryFolderText = File::ReadAllText(steamPath + "/steamapps/libraryfolders.vdf");
-
-						//Regex to find the drive that the steam library is located
-						String^ steamDriveRegex = "\"\\d\"[\\s]*{[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*\""+dcsSteamID+"\"[\\s]*\"[0-9]*\"[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*}";
-
-						RegularExpressions::Match^ drive = RegularExpressions::Regex::Match(libraryFolderText, steamDriveRegex);
-
-						//Regex to get the path line of the steam library
-						String^ steamLibraryRegex = "\"path\"[\\s]*[\\s\\r\\n\\w\\:\\\\\\\"\\s\\(\\)\\{]*(Steam|SteamLibrary)\"";
-
-						RegularExpressions::Match^ path = RegularExpressions::Regex::Match(drive->Value, steamLibraryRegex);
-
-						//Regex to extract out the actual path
-						String^ libraryLocationRegex = "\"\\w:[\\w\\d\\\\\\s\\(\\)\\\"]*\"";
-
-						RegularExpressions::Match^ folderLocation = RegularExpressions::Regex::Match(path->Value, libraryLocationRegex);
-
-						//Trim any double quotes and fix the extra backslashes coming in from the libraryfolders file
-						configLocation = folderLocation->Value->Trim('\"')->Replace("\\\\", "\\") + "\\steamapps\\common\\DCSWorld\\Config\\Liveries";
-
-						//TODO: verify that this is where the actual Liveries file is installed to
-					}
-
-					return VerifyLocation(configLocation);
-
-				}
-				catch (Exception^ ex)
-				{
-					LogException(ex, "An error occured while attempting to retreive the DCS Steam Location");
-					return "";
-				}
-			}
 
 
 		#pragma endregion
@@ -614,64 +566,27 @@ namespace DCSLiveryExpander
 			{
 				try
 				{
-					String^ steamDCSLocation = "";
-					String^ dcsLocation = "";
-					String^ dcsBetaLocation = "";
-					//We will want to read the registry keys to get the steam/DCS folder
-
-					//Look for standalone DCS installation
-
-					//Registry steamInstallKey = 
-					//Registry dcsInstallKey =
-
-
-					//We are getting the registry keys as objects separate so we can verify they exist before doing ToString()
-					Object^ steamRegistryObject = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", "NotFound");
-					Object^ dcsRegistryObject = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World", "Path", "NotFound");
-					Object^ dcsBetaRegistryObject = Registry::GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Eagle Dynamics\\DCS World OpenBeta", "Path", "NotFound");
+					SteamInfo^ steamInfo = gcnew SteamInfo;
+					DCSInfo^ dcsInfo = gcnew DCSInfo;
+					DCSBetaInfo^ dcsBetaInfo = gcnew DCSBetaInfo;
 
 
 
 
-					String^ steamInstallRegistry = (steamRegistryObject == nullptr ? "NotFound" : steamRegistryObject->ToString());
-					String^ dcsInstallRegistry = (dcsRegistryObject == nullptr ? "NotFound" : dcsRegistryObject->ToString());
-					String^ dcsBetaInstallRegistry = (dcsBetaRegistryObject == nullptr ? "NotFound" : dcsBetaRegistryObject->ToString());
-
-					bool steamRegistryFound = String::Equals(steamInstallRegistry, "NotFound");
-					bool dcsRegistryFound = String::Equals(dcsInstallRegistry, "NotFound");
-					bool dcsBetaRegistryFound = String::Equals(dcsBetaInstallRegistry, "NotFound");
-
-					if (steamRegistryFound)
-					{
-						steamDCSLocation = GetDCSSteamLocation(steamInstallRegistry);
-					}
+					//TODO WE ARE HERE AND THIS IS WHAT YOU ARE WORKING ON
 					
-					if (dcsRegistryFound)
-					{
-						dcsLocation = VerifyLocation(dcsInstallRegistry);
-					}
 
-					if (dcsBetaRegistryFound)
-					{
-						dcsBetaLocation = VerifyLocation(dcsBetaInstallRegistry);
-					}
 
-					//Error handling will need to be improved
+
+					//TODO Error handling will need to be improved
 					if (String::IsNullOrWhiteSpace(steamDCSLocation) || String::IsNullOrWhiteSpace(dcsLocation) || String::IsNullOrWhiteSpace(dcsBetaLocation))
 					{
-
+						MessageBox::Show("No DCS installations were found in registry, use the Custom Folder if this is in error");
 					}
 					else
 					{
 						//Report that no paths could be found
 					}
-
-					//if(installLocation)
-					int test = 1;
-
-
-
-					//Game ID is 223750
 
 
 					ResetForm();
